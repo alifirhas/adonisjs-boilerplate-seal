@@ -1,19 +1,19 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeCreate, beforeFetch, beforeFind, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeCreate, beforeFetch, beforeFind, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid'
-import Comment from '../Comment/Comment'
+import Post from '../Post/Post'
 
-export default class Post extends BaseModel {
+export default class Comment extends BaseModel {
   public static softDelete = true
 
   @column({ isPrimary: true })
   public id: string
 
   @column()
-  public title: string
+  public content: string
 
   @column()
-  public content: string
+  public post_id: string
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime
@@ -25,7 +25,7 @@ export default class Post extends BaseModel {
   public deleted_at: DateTime
 
   static get table() {
-    return "posts" // table name
+    return "comments" // table name
   }
 
   @beforeFind()
@@ -39,13 +39,13 @@ export default class Post extends BaseModel {
   }
 
   @beforeCreate()
-  public static setUUID(data: Post) {
+  public static setUUID(data: Comment) {
     const namespace = uuidv4()
-    data.id = uuidv5('Post', namespace)
+    data.id = uuidv5('Comment', namespace)
   }
 
-  @hasMany(() => Comment, {
-    foreignKey: 'post_id',
+  @belongsTo(() => Post, {
+    foreignKey: 'post_id'
   })
-  public comments: HasMany<typeof Comment>
+  public posts: BelongsTo<typeof Post>
 }
